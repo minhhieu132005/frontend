@@ -1,31 +1,27 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import SessionItem from '../../components/schedule/SessionItem';
-import RescheduleModal from '../../components/modals/RescheduleModal';
-import CancelModal from '../../components/modals/CancelModal';
-import { CalendarPlus, Search, MessageSquare } from 'lucide-react'; // Icons cho sidebar
+import RescheduleModal from '../../components/modals/RescheduleModal'; // (Giả sử bạn đã có file này như hướng dẫn trước)
+import CancelModal from '../../components/modals/CancelModal';         // (Giả sử bạn đã có file này)
+import { CalendarPlus, Users, Star } from 'lucide-react';
 
 const MySchedulePage = () => {
-  // State quản lý modal
   const [showReschedule, setShowReschedule] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
 
-  // Mock Data
   const sessions = [
-    { id: 1, name: "Nguyễn Văn A", subject: "Data Structures & Algorithms", time: "15 Oct 2025 | 2:00 PM - 4:00 PM" },
-    { id: 2, name: "Nguyễn Văn A", subject: "Data Structures & Algorithms", time: "18 Oct 2025 | 2:00 PM - 4:00 PM" },
-    { id: 3, name: "Nguyễn Văn A", subject: "Data Structures & Algorithms", time: "20 Oct 2025 | 2:00 PM - 4:00 PM" },
+    { id: 1, name: "Nguyễn Văn A", subject: "Data Structures & Algorithms", time: "Oct 18, 2025 | 2:00 PM - 3:30 PM" },
+    { id: 2, name: "Trần Thị B", subject: "Introduction to AI", time: "Oct 20, 2025 | 9:00 AM - 11:00 AM" },
   ];
 
   return (
-    <div className="max-w-6xl mx-auto p-6 pt-8">
-      {/* Tiêu đề Section */}
-      <div className="flex gap-12">
+    <div className="min-h-screen bg-[#EEEEEE] p-6 font-sans">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6">
         
-        {/* CỘT TRÁI: LỊCH TRÌNH */}
-        <div className="flex-1">
+        {/* CỘT TRÁI */}
+        <div className="flex-1 border border-gray-300 rounded-2xl p-6 bg-[#EEEEEE]">
           <h2 className="text-xl font-bold text-gray-900 mb-1">Upcoming Sessions</h2>
-          <p className="text-gray-400 text-sm mb-6">Your scheduled tutoring sessions</p>
-          
+          <p className="text-gray-500 text-sm mb-6">Your scheduled tutoring sessions</p>
           <div className="space-y-4">
             {sessions.map(s => (
               <SessionItem 
@@ -40,41 +36,42 @@ const MySchedulePage = () => {
           </div>
         </div>
 
-        {/* CỘT PHẢI: SIDEBAR (Fig 71 right side) */}
-        <div className="w-72 hidden md:block">
-          <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <button className="flex items-center gap-3 w-full text-left text-gray-600 hover:text-blue-600 hover:bg-gray-50 p-2 rounded-lg transition-colors">
-              <CalendarPlus size={20} /> Schedule New Session
-            </button>
-            <button className="flex items-center gap-3 w-full text-left text-gray-600 hover:text-blue-600 hover:bg-gray-50 p-2 rounded-lg transition-colors">
-              <Search size={20} /> Find a Tutor
-            </button>
-            <button className="flex items-center gap-3 w-full text-left text-gray-600 hover:text-blue-600 hover:bg-gray-50 p-2 rounded-lg transition-colors">
-              <MessageSquare size={20} /> Leave Feedback
-            </button>
+        {/* CỘT PHẢI */}
+        <div className="w-full md:w-80 flex flex-col gap-6">
+          <div className="border border-gray-300 rounded-2xl p-6 bg-[#EEEEEE]">
+            <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
+            <div className="space-y-3">
+              <Link to="/find-tutor" className="flex items-center gap-3 w-full text-left text-gray-900 font-medium bg-[#DCDCDC] hover:bg-gray-300 border border-gray-300 p-3 rounded-lg transition-colors">
+                <CalendarPlus size={20} /> Schedule New Session
+              </Link>
+              <Link to="/find-tutor" className="flex items-center gap-3 w-full text-left text-gray-900 font-medium bg-[#DCDCDC] hover:bg-gray-300 border border-gray-300 p-3 rounded-lg transition-colors">
+                <Users size={20} /> Find a Tutor
+              </Link>
+              <button className="flex items-center gap-3 w-full text-left text-gray-900 font-medium bg-[#DCDCDC] hover:bg-gray-300 border border-gray-300 p-3 rounded-lg transition-colors">
+                <Star size={20} /> Leave Feedback
+              </button>
+            </div>
           </div>
 
-          <h3 className="font-bold text-gray-900 mt-10 mb-4">Recent Feedback</h3>
-          <div className="space-y-4">
-            {[1, 2].map((i) => (
-              <div key={i} className="border-b border-gray-100 pb-3">
+          <div className="border border-gray-300 rounded-2xl p-6 h-full bg-[#EEEEEE]">
+            <h3 className="font-bold text-gray-900 mb-4">Recent Feedback</h3>
+            <div className="space-y-6">
+              <div className="border-b border-gray-300 pb-4">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="font-semibold text-sm">Dr Nguyễn Văn A</span>
-                  <div className="flex text-yellow-400 text-xs">★★★★★</div>
+                  <span className="font-bold text-sm text-gray-800">Dr Nguyễn Văn A</span>
+                  <div className="flex text-[#0056b3] text-xs">★★★★★</div>
                 </div>
-                <p className="text-xs text-gray-500 italic">"Excellent explanation of complex algorithms..."</p>
+                <p className="text-xs text-gray-500">Excellent explanation of complex algorithms...</p>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* MODALS */}
-      <RescheduleModal isOpen={showReschedule} onClose={() => setShowReschedule(false)} />
-      <CancelModal isOpen={showCancel} onClose={() => setShowCancel(false)} onConfirm={() => setShowCancel(false)} />
+      {/* Modals */}
+      {showReschedule && <RescheduleModal isOpen={true} onClose={() => setShowReschedule(false)} />}
+      {showCancel && <CancelModal isOpen={true} onClose={() => setShowCancel(false)} />}
     </div>
   );
 };
-
 export default MySchedulePage;
