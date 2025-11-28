@@ -2,16 +2,25 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Bell, Settings, User, BookOpen } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar = ({ role = "student" }) => {
   const location = useLocation();
 
-  const navLinks = [
+  const StudentLinks = [
     { name: 'My Schedule', path: '/my-schedule' },
     { name: 'My Session', path: '/my-sessions' },
     { name: 'Find Tutor', path: '/find-tutor' },
     { name: 'My Document', path: '/my-documents' },
     { name: 'My Profile', path: '/profile' },
   ];
+  const TutorLinks = [
+    { name: 'My Schedule', path: '/my-schedule' },
+    { name: 'My Document', path: '/my-documents' },
+    { name: 'My Profile', path: '/profile' },
+    {name: 'My Feedback', path:'/feedback'}
+  ];
+
+  const navLinks = role === "tutor" ? TutorLinks : StudentLinks;
+
 
   const isActive = (path) => location.pathname === path;
 
