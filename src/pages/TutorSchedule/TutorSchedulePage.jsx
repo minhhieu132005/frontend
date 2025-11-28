@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../../components/common/Navbar";
 import SessionItemTutor from "../../components/schedule/SessionItemTutor";
-import RescheduleModal from "../../components/modals/RescheduleModal";
+import RescheduleModalTutor from "../../components/modals/RescheduleModalTutor";
 import RegisterModal from "../../components/common/RegisterModal";
 import ClassMembersPage from "./ClassMemPage";
 import { CalendarPlus, BookOpen, Star } from "lucide-react";
@@ -143,7 +143,7 @@ export default function TutorSchedulePage() {
       </div>
 
       {/* MODALS */}
-      <RescheduleModal
+      <RescheduleModalTutor
         isOpen={openReschedule}
         onClose={() => setOpenReschedule(false)}
       />

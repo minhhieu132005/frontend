@@ -24,14 +24,14 @@ const RescheduleModal = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <div>
+        {/* <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Reason for reschedule (Optional)</label>
           <textarea 
             rows="3"
             placeholder="Let your tutor know why you need to reschedule..." 
             className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-blue-500 resize-none"
           ></textarea>
-        </div>
+        </div> */}
       </div>
 
       <div className="flex justify-end gap-3 mt-6">
