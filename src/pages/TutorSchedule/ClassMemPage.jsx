@@ -47,10 +47,11 @@ export default function ClassMembersPage() {
 
   // Danh sách sinh viên mẫu
   const students = [
-    { id: 1, name: "Nguyễn Văn A", email: "a@student.edu.vn" },
-    { id: 2, name: "Trần Thị B", email: "b@student.edu.vn" },
-    { id: 3, name: "Lê Văn C", email: "c@student.edu.vn" },
-  ];
+  { id: 1, name: "Nguyễn Văn A", major: "Software Engineering", year: "1st Year" },
+  { id: 2, name: "Trần Thị B", major: "Information Systems", year: "2nd Year" },
+  { id: 3, name: "Lê Văn C", major: "Computer Science", year: "3rd Year" },
+];
+
 
   return (
     <div className="min-h-screen bg-[#EEEEEE] font-sans">
@@ -97,36 +98,56 @@ export default function ClassMembersPage() {
             </div>
           </div>
 
-          {/* STUDENTS TABLE */}
-          <div>
-            <div className="grid grid-cols-3 font-semibold text-gray-700 text-sm pb-3 border-b">
-              <span>Name</span>
-              <span>Email</span>
-              <span className="text-center">Attendance</span>
-            </div>
+ 
 
-            <div className="divide-y">
-              {students.map((st) => (
-                <div key={st.id} className="grid grid-cols-3 items-center py-4 hover:bg-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#0056b3] text-white rounded-full flex items-center justify-center font-bold">
-                      {st.name.split(" ").map(n => n[0]).join("")}
+            {/* LIST */}
+            <div className="space-y-4">
+                {students.map((st) => (
+                    <div 
+                    key={st.id} 
+                    className="flex justify-between items-start bg-[#FFFFFF] border border-gray-300 rounded-xl p-4"
+                    >
+      
+                {/* LEFT SIDE - Student info */}
+                <div className="flex items-start gap-4">
+                    
+                    {/* Avatar */}
+                    <div className="w-12 h-12 rounded-full bg-[#0056b3] flex items-center justify-center 
+                                    text-white font-bold text-lg shrink-0">
+                    {st.name.split(" ").map(n => n[0]).join("").substring(0, 2)}
                     </div>
-                    <span className="text-gray-900 font-medium">{st.name}</span>
-                  </div>
 
-                  <span className="text-gray-600">{st.email}</span>
+                    {/* Info */}
+                    <div className="flex flex-col">
+                    <p className="font-bold text-gray-900 text-md">{st.name}</p>
+                    <p className="text-gray-600 text-sm">{st.major}</p>
+                    <p className="text-gray-500 text-sm mb-2">{st.year}</p>
 
-                  <div className="text-center">
-                    <button className="bg-[#0056b3] text-white py-1.5 px-4 rounded-lg font-semibold hover:bg-blue-700 transition">
-                      Attendance
+                    {/* Add Note */}
+                    <button
+                        onClick={() => window.location.href = "#"}
+                        className="bg-[#0056b3] hover:bg-[#004a9a] text-white 
+                                text-sm font-semibold py-1 px-4 rounded-lg w-fit"
+                    >
+                        Add Note
                     </button>
-                  </div>
+                    </div>
                 </div>
-              ))}
-            </div>
 
-          </div>
+                {/* RIGHT SIDE — Attendance button */}
+                <button
+                    onClick={() => alert(`Attendance for ${st.name}`)}
+                    className="bg-[#DCDCDC] hover:bg-gray-300 border border-gray-300 
+                            text-gray-900 font-bold text-sm py-2 px-5 rounded-lg"
+                >
+                    Attendance
+                </button>
+
+    </div>
+  ))}
+</div>
+
+
 
         </div>
 
