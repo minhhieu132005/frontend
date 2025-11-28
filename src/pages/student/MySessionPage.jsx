@@ -1,71 +1,73 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RegisteredSessionCard from '../../components/schedule/RegisteredSessionCard';
-// Import các modal nếu cần dùng chức năng
-import RescheduleModal from '../../components/modals/RescheduleModal';
 import CancelModal from '../../components/modals/CancelModal';
-import FeedbackModal from '../../components/modals/FeedbackModal';
+import RescheduleModal from '../../components/modals/RescheduleModal'; // Giả sử bạn đã có file này
+import { getMyBookings, cancelBooking } from '../../services/studentService';
 
 const MySessionPage = () => {
-  // State quản lý modal
+  const [sessions, setSessions] = useState([]);
   const [modalState, setModalState] = useState({ type: null, selectedSession: null });
 
-  // Mock Data giống trong hình ảnh bạn gửi
-  const sessions = [
-    { 
-      id: 1, 
-      tutorName: "Nguyễn Văn A", 
-      subject: "Data Structures & Algorithms", 
-      time: "Oct 18, 2025 | 2:00 PM - 3:30 PM",
-      status: "Confirm" 
-    },
-    { 
-      id: 2, 
-      tutorName: "Nguyễn Văn A", 
-      subject: "Data Structures & Algorithms", 
-      time: "Oct 18, 2025 | 2:00 PM - 3:30 PM",
-      status: "Done" 
-    },
-    { 
-      id: 3, 
-      tutorName: "Nguyễn Văn A", 
-      subject: "Data Structures & Algorithms", 
-      time: "Oct 18, 2025 | 2:00 PM - 3:30 PM",
-      status: "Done" 
-    },
-  ];
+  // Load dữ liệu thật từ API
+  const loadSessions = async () => {
+    try {
+      const data = await getMyBookings();
+      // Map data API -> UI props
+      const formatted = data.map(b => ({
+        id: b.booking_id,
+        tutorName: b.tutor?.name || "Unknown",
+        subject: "General Tutoring", // Hoặc lấy từ b.tutor.expertise nếu có
+        startTime: b.slot.start_time, // Truyền nguyên gốc để Card tự format
+        endTime: b.slot.end_time,
+        status: "Confirm" // Logic tạm: Nếu chưa qua ngày thì là Confirm
+      }));
+      setSessions(formatted);
+    } catch (e) { console.error(e); }
+  };
 
-  const openModal = (type, session) => setModalState({ type, selectedSession: session });
-  const closeModal = () => setModalState({ type: null, selectedSession: null });
+  useEffect(() => { loadSessions(); }, []);
+
+  // Xử lý Hủy
+  const handleCancelConfirm = async () => {
+    if (!modalState.selectedSession) return;
+    try {
+      await cancelBooking(modalState.selectedSession.id);
+      alert("Cancelled successfully!");
+      setModalState({ type: null, selectedSession: null });
+      loadSessions();
+    } catch (e) { alert("Failed to cancel"); }
+  };
 
   return (
-    // Nền xám #EEEEEE toàn màn hình
     <div className="min-h-screen bg-[#EEEEEE] p-6 font-sans">
       <div className="max-w-5xl mx-auto">
-        
-        {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900">My Session</h2>
-          <p className="text-gray-500 text-sm">Manage your tutoring sessions</p>
-        </div>
-
-        {/* Danh sách Sessions */}
+        <h2 className="text-xl font-bold text-gray-900 mb-6">My Session</h2>
         <div className="space-y-4">
           {sessions.map(session => (
             <RegisteredSessionCard 
               key={session.id} 
               session={session}
-              onReschedule={(s) => openModal('reschedule', s)}
-              onCancel={(s) => openModal('cancel', s)}
-              onFeedback={(s) => openModal('feedback', s)}
+              onReschedule={(s) => setModalState({ type: 'reschedule', selectedSession: s })}
+              onCancel={(s) => setModalState({ type: 'cancel', selectedSession: s })}
+              onFeedback={(s) => setModalState({ type: 'feedback', selectedSession: s })}
             />
           ))}
         </div>
       </div>
 
-      {/* Modals Area */}
-      {modalState.type === 'reschedule' && <RescheduleModal isOpen={true} onClose={closeModal} />}
-      {modalState.type === 'cancel' && <CancelModal isOpen={true} onClose={closeModal} onConfirm={closeModal} />}
-      {modalState.type === 'feedback' && <FeedbackModal isOpen={true} onClose={closeModal} />}
+      {/* Modals */}
+      {modalState.type === 'cancel' && (
+        <CancelModal 
+          isOpen={true} 
+          onClose={() => setModalState({ type: null, selectedSession: null })} 
+          onConfirm={handleCancelConfirm} 
+        />
+      )}
+      
+      {/* Thêm RescheduleModal nếu cần */}
+      {modalState.type === 'reschedule' && (
+         <RescheduleModal isOpen={true} onClose={() => setModalState({ type: null, selectedSession: null })} />
+      )}
     </div>
   );
 };
