@@ -8,27 +8,14 @@ export default function ClassMembersPage() {
 
   // Danh sách lớp giống bên TutorSchedulePage
   const classes = [
-    {
-      id: 1,
-      studentCount: 25,
-      location: "Room H6-306",
-      subject: "Data Structures & Algorithms",
-      time: "Oct 18, 2025 | 2:00 PM - 3:30 PM",
-    },
+   
     {
       id: 2,
-      studentCount: 18,
-      subject: "Probability & Statistics",
-      location: "Room H3-201",
-      time: "Oct 20, 2025 | 9:00 AM - 11:00 AM",
-    },
-    {
-      id: 3,
-      studentCount: 15,
-      subject: "Computer Architecture",
-      location: "Room B4-105",
-      time: "Oct 22, 2025 | 1:00 PM - 2:30 PM",
-    },
+      studentCount: 1,
+      subject: "Introduction to Computing",
+      location: "Room H6-201",
+      time: "Nov 30, 2025 | 5:00 AM - 6:00 AM",
+    }   
   ];
 
   // TÌM LỚP TƯƠNG ỨNG THEO ID
@@ -45,11 +32,11 @@ export default function ClassMembersPage() {
     ? classInfo.time.split("|")
     : [classInfo.time, ""];
 
+    
   // Danh sách sinh viên mẫu
   const students = [
-  { id: 1, name: "Nguyễn Văn A", major: "Software Engineering", year: "1st Year" },
-  { id: 2, name: "Trần Thị B", major: "Information Systems", year: "2nd Year" },
-  { id: 3, name: "Lê Văn C", major: "Computer Science", year: "3rd Year" },
+  { id: 1, name: "Tran Van J", major: "Computer Science", year: "2nd Year" },
+ 
 ];
 
 

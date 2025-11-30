@@ -21,7 +21,7 @@ export const getTutorBookings = async () => {
 
 // Hủy buổi học (for tutor OR student)
 export const cancelBooking = async (bookingId) => {
-  const response = await api.put(`/bookings/cancel/${bookingId}`);
+  const response = await api.delete(`/tutors/slot/${bookingId}`);
   return response.data;
 };
 
@@ -32,10 +32,7 @@ export const getFreeSlotsForBooking = async (bookingId) => {
 };
 
 // Thực hiện đổi giờ
-export const rescheduleBooking = async (bookingId, newSlotId) => {
-  const response = await api.put('/bookings/reschedule', {
-    booking_id: bookingId,
-    new_slot_id: newSlotId,
-  });
+export const updateSlot = async (slotId, updatedData) => {
+  const response = await api.put(`/tutors/slot/${slotId}`, updatedData);
   return response.data;
 };

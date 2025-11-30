@@ -9,11 +9,11 @@ import ClassMembersPage from './pages/TutorSchedule/ClassMemPage'
 function App() {
    useEffect(() => {
     //hardcode do không làm trang đăng nhập=)))
-    const LoginToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwidXNlcm5hbWUiOiJib2IiLCJyb2xlIjoidHV0b3IiLCJpYXQiOjE3NjQ0Njg1OTksImV4cCI6MTc2NDQ3MjE5OX0.7GsFOZSSyU4tLUgkbJz_Bxmjg85Uj2BdRQzpof9crnY";
+    const LoginToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJhbGljZSIsInJvbGUiOiJ0dXRvciIsImlhdCI6MTc2NDQ4MDk1NywiZXhwIjoxNzY0NDg0NTU3fQ.F2fhUn5YGl4MFtWVG2zOcsIT_eumgtYA4M_N5NYWhhE";
 
     localStorage.setItem("token", LoginToken);
     localStorage.setItem("role", "tutor");  
-    localStorage.setItem("userId", "6");   
+    localStorage.setItem("userId", "2");   
   }, []);
   return (
     <Router>

@@ -11,7 +11,7 @@ import {createTutorSlot,
   getTutorBookings ,
   cancelBooking,
   getFreeSlotsForBooking,
-  rescheduleBooking } from '../../services/tutorService'
+  updateSlot } from '../../services/tutorService'
 
 export default function TutorSchedulePage() {
   const [openReschedule, setOpenReschedule] = useState(false);
@@ -47,7 +47,11 @@ export default function TutorSchedulePage() {
   // 1. Load lịch dạy tutor
   // ==========================
   useEffect(() => {
-    loadTutorSchedule();
+    const token = localStorage.getItem("token");
+    if(token){
+       loadTutorSchedule();
+    }
+   
   }, []);
   const loadTutorSchedule = async () => {
     try {
@@ -81,23 +85,30 @@ export default function TutorSchedulePage() {
       alert("Schedule cancelled!");
       loadTutorSchedule();
     } catch (err) {
-      alert("Cancel failed.");
+      alert("Slot đã có người đăng kí, không thể hủy");
     }
   };
 
   // ==========================
   // 4. Reschedule
   // ==========================
-  const handleReschedule = async (newSlotId) => {
-    try {
-      await rescheduleBooking(selectedSlotId, newSlotId);
-      alert("Rescheduled successfully!");
-      setOpenReschedule(false);
-      loadTutorSchedule();
-    } catch (err) {
-      alert("Reschedule failed.");
-    }
-  };
+  const handleReschedule = async ({ slotId, newDate, newTime }) => {
+  try {
+    if (!newDate || !newTime) return;
+
+    const start_time = new Date(`${newDate}T${newTime}`).toISOString();
+    const end_time = new Date(new Date(`${newDate}T${newTime}`).getTime() + 60*60*1000).toISOString(); // kéo dài 1h
+
+    await updateSlot(slotId, { start_time, end_time });
+
+    alert("Slot updated successfully!");
+    setOpenReschedule(false);
+    loadTutorSchedule();
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "Update failed");
+  }
+};
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
       {/* <Navbar role="tutor" /> */}
@@ -125,10 +136,10 @@ export default function TutorSchedulePage() {
           {/* SESSIONS */}
           <div className="space-y-4">
             {sessions.map((s) => {
-              if (!s.slot) return null;
+              if (!s) return null;
 
-              const startDate = new Date(s.slot.start_time);
-              const endDate = new Date(s.slot.end_time);
+              const startDate = new Date(s.start_time);
+              const endDate = new Date(s.end_time);
 
               const dateOnly = startDate.toLocaleDateString("en-US", {
                 month: "short",
@@ -148,21 +159,21 @@ export default function TutorSchedulePage() {
 
               return (
                 <SessionItemTutor
-                  key={s.slot.slot_id}
-                  subject={s.slot.subject}
-                  studentCount={s.slot.current_students || 0}
-                  location={s.slot.room}
+                  key={s.slot_id}
+                  subject={s.subject}
+                  studentCount={s.current_students || 0}
+                  location={s.room}
                   date={dateOnly}
                   startTime={startTime}
                   endTime={endTime}
 
                   onReschedule={() => {
-                    setSelectedSlotId(s.booking_id);
+                    setSelectedSlotId(s.slot_id);
                     setOpenReschedule(true);
                   }}
 
-                  onCancel={() => handleCancel(s.booking_id)}
-                  onViewClass={() => navigate(`/class/${s.slot.slot_id}`)}
+                  onCancel={() => handleCancel(s.slot_id)}
+                  onViewClass={() => navigate(`/class/${s.slot_id}`)}
                 />
               );
             })}
@@ -238,10 +249,12 @@ export default function TutorSchedulePage() {
       {/* MODALS */}
       <RescheduleModalTutor
         isOpen={openReschedule}
+        slotId={selectedSlotId}
+        onUpdated={loadTutorSchedule}   // reload lại sau khi update slot
         onClose={() => setOpenReschedule(false)}
-        onConfirm={handleReschedule}      
-        bookingId={selectedSlotId}
+        onConfirm={handleReschedule}    // gọi API updateSlot
       />
+
 
       <RegisterModalTutor
         isOpen={openRegister}
