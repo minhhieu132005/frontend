@@ -1,42 +1,103 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../../components/common/Navbar";
 import SessionItemTutor from "../../components/schedule/SessionItemTutor";
 import RescheduleModalTutor from "../../components/modals/RescheduleModalTutor";
-import RegisterModal from "../../components/common/RegisterModal";
+import RegisterModalTutor from "../../components/modals/RegisterModalTutor";
 import ClassMembersPage from "./ClassMemPage";
 import { CalendarPlus, BookOpen, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import {createTutorSlot,
+  getTutorBookings ,
+  cancelBooking,
+  getFreeSlotsForBooking,
+  rescheduleBooking } from '../../services/tutorService'
 
 export default function TutorSchedulePage() {
   const [openReschedule, setOpenReschedule] = useState(false);
   const [openRegister, setOpenRegister] = useState(false);
+  const [selectedSlotId, setSelectedSlotId] = useState(null);
+  const [sessions, setSessions] = useState([]);
   const navigate = useNavigate();
-  const sessions = [
-    {
-      id: 1,
-      studentCount: 25,
-      location:"Room H6-306",
-      subject: "Data Structures & Algorithms",
-      time: "Oct 18, 2025 | 2:00 PM - 3:30 PM",
-    },
-     {
-      id: 2,
-      studentCount: 18,
-      subject: "Probability & Statistics",
-      location: "Room H3-201",
-      time: "Oct 20, 2025 | 9:00 AM - 11:00 AM",
-    },
-    {
-      id: 3,
-      studentCount: 15,
-      subject: "Computer Architecture",
-      location: "Room B4-105",
-      time: "Oct 22, 2025 | 1:00 PM - 2:30 PM",
-    },
+  // const sessions = [
+  //   {
+  //     id: 1,
+  //     studentCount: 25,
+  //     location:"Room H6-306",
+  //     subject: "Data Structures & Algorithms",
+  //     time: "Oct 18, 2025 | 2:00 PM - 3:30 PM",
+  //   },
+  //    {
+  //     id: 2,
+  //     studentCount: 18,
+  //     subject: "Probability & Statistics",
+  //     location: "Room H3-201",
+  //     time: "Oct 20, 2025 | 9:00 AM - 11:00 AM",
+  //   },
+  //   {
+  //     id: 3,
+  //     studentCount: 15,
+  //     subject: "Computer Architecture",
+  //     location: "Room B4-105",
+  //     time: "Oct 22, 2025 | 1:00 PM - 2:30 PM",
+  //   },
 
-  ];
+  // ];
+   // ==========================
+  // 1. Load lịch dạy tutor
+  // ==========================
+  useEffect(() => {
+    loadTutorSchedule();
+  }, []);
+  const loadTutorSchedule = async () => {
+    try {
+      const data = await getTutorBookings();
+      setSessions(data);
+    } catch (err) {
+      console.error("Error loading tutor slots:", err);
+    }
+  };
+   // ==========================
+  // 2. Create Schedule
+  // ==========================
+  const handleCreateSchedule = async (formData) => {
+    try {
+      await createTutorSlot(formData);
+      alert("Created schedule successfully!");
+      setOpenRegister(false);
+      loadTutorSchedule();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create schedule.");
+    }
+  };
 
+  // ==========================
+  // 3. Cancel schedule
+  // ==========================
+  const handleCancel = async (slotId) => {
+    try {
+      await cancelBooking(slotId);
+      alert("Schedule cancelled!");
+      loadTutorSchedule();
+    } catch (err) {
+      alert("Cancel failed.");
+    }
+  };
+
+  // ==========================
+  // 4. Reschedule
+  // ==========================
+  const handleReschedule = async (newSlotId) => {
+    try {
+      await rescheduleBooking(selectedSlotId, newSlotId);
+      alert("Rescheduled successfully!");
+      setOpenReschedule(false);
+      loadTutorSchedule();
+    } catch (err) {
+      alert("Reschedule failed.");
+    }
+  };
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
       {/* <Navbar role="tutor" /> */}
@@ -63,19 +124,51 @@ export default function TutorSchedulePage() {
 
           {/* SESSIONS */}
           <div className="space-y-4">
-            {sessions.map((s) => (
-              <SessionItemTutor
-                key={s.id}
-                studentCount={s.studentCount}
-                subject={s.subject}
-                location={s.location}
-                time={s.time}
-                onReschedule={() => setOpenReschedule(true)}
-                onCancel={() => alert("Cancel clicked")}
-                onViewClass={() => navigate(`/class/${s.id}`)}
-              />
-            ))}
+            {sessions.map((s) => {
+              if (!s.slot) return null;
+
+              const startDate = new Date(s.slot.start_time);
+              const endDate = new Date(s.slot.end_time);
+
+              const dateOnly = startDate.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              });
+
+              const startTime = startDate.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+              const endTime = endDate.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+              return (
+                <SessionItemTutor
+                  key={s.slot.slot_id}
+                  subject={s.slot.subject}
+                  studentCount={s.slot.current_students || 0}
+                  location={s.slot.room}
+                  date={dateOnly}
+                  startTime={startTime}
+                  endTime={endTime}
+
+                  onReschedule={() => {
+                    setSelectedSlotId(s.booking_id);
+                    setOpenReschedule(true);
+                  }}
+
+                  onCancel={() => handleCancel(s.booking_id)}
+                  onViewClass={() => navigate(`/class/${s.slot.slot_id}`)}
+                />
+              );
+            })}
           </div>
+
+
         </div>
 
         {/* RIGHT SIDE */}
@@ -146,12 +239,14 @@ export default function TutorSchedulePage() {
       <RescheduleModalTutor
         isOpen={openReschedule}
         onClose={() => setOpenReschedule(false)}
+        onConfirm={handleReschedule}      
+        bookingId={selectedSlotId}
       />
 
-      <RegisterModal
+      <RegisterModalTutor
         isOpen={openRegister}
         onClose={() => setOpenRegister(false)}
-        onConfirm={() => alert("Registered")}
+        onConfirm={handleCreateSchedule}
       />
     </div>
   );

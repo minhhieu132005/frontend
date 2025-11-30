@@ -32,7 +32,7 @@ api.interceptors.response.use(
       localStorage.removeItem('userId');
       
       // Reload lại trang để kích hoạt Auto Login trong App.jsx
-      window.location.href = '/'; 
+      // window.location.href = '/'; 
     }
     return Promise.reject(error);
   }
